@@ -1,5 +1,5 @@
 import React from 'react';
-import { 
+import {
     Container,
     Box,
     Grid,
@@ -54,10 +54,10 @@ var selectedGraph = {
 
 const options = {
     layout: {
-      hierarchical: false
+        hierarchical: false
     },
     edges: {
-      color: "#000000"
+        color: "#000000"
     }
 };
 
@@ -83,25 +83,28 @@ const CsvData = ({ data, selectedData }) => {
     return (
         <>
             <TableRow
-              key={Date.now()}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                key={Date.now()}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <TableCell align="center">
-                <input className='checkboxstyle' onClick={() => selectedData(data)} type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
-              </TableCell>
-              <TableCell align="center">{Date(20190429)}</TableCell>
-              <TableCell align="center">{data.destination_port}</TableCell>
-              <TableCell align="center">{data.hostname}</TableCell>
-              <TableCell align="center">{data.process}</TableCell>
-              <TableCell align="center">{data.source_ip}</TableCell>
+                <TableCell align="center">
+                    <input className='checkboxstyle' onClick={() => selectedData(data)} type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
+                </TableCell>
+                <TableCell align="center">{Date(20190429)}</TableCell>
+                <TableCell align="center">{data.destination_port}</TableCell>
+                <TableCell align="center">{data.hostname}</TableCell>
+                <TableCell align="center">{data.process}</TableCell>
+                <TableCell align="center">{data.source_ip}</TableCell>
             </TableRow>
         </>
     )
 }
 
 const uploadcsv = () => {
+
+
+
     const router = useRouter();
-    const [csvdata, setcsvdata] = React.useState([]);
+    const [csvdata, setcsvdata] = React.useState([{ 0: "0" }]);
     const [permanentcsvdata, setpermanentcsvdata] = React.useState([]);
 
     const [columnswork, setcolumnswork] = React.useState([]);
@@ -109,7 +112,7 @@ const uploadcsv = () => {
 
     const [hostname, sethostname] = React.useState('');
     const [destinationport, setdestinationport] = React.useState('');
-    
+
 
 
     const [showall, setshowall] = React.useState(true);
@@ -122,10 +125,43 @@ const uploadcsv = () => {
         setOpendialogcolumn(false);
     };
 
-
-
     const [openfilter, setopenfilter] = React.useState(false);
     const [openfilter2, setopenfilter2] = React.useState(false);
+
+
+    React.useEffect(() => {
+
+        const finalData = [];
+        const fetchData = (column) => {
+            fetch('https://regexapi.herokuapp.com/verify/' + String(column), {
+                headers: {
+                    "Access-Control-Allow-Origin": "*"
+                }
+            })
+                .then((response) => response.json())
+                .then((response) => {
+                    finalData.push(response);
+                })
+                .then((response) => console.log(response))
+                .catch((err) => console.log(err))
+        }
+
+        if (csvdata[0] != undefined) {
+            let tempCol = Object.keys(csvdata[0]);
+
+            console.log("temp col", tempCol);
+            // api call
+            tempCol.forEach(col => {
+                fetchData(col);
+            })
+            console.log("finalCol", finalData);
+            setpermanentcsvdata(finalData);
+            setcsvdata(finalData);
+            setcolumnswork(finalData)
+        }
+
+
+    }, [csvdata])
 
 
     const handleClickfilter = (data) => {
@@ -145,39 +181,70 @@ const uploadcsv = () => {
         setopenfilter2(false);
     };
 
-    
+
 
 
     const handleForce = (data, fileInfo) => {
-        var tempnotidentifycolumn = [];
-        // setcolumns(Object.keys(data[0]));
-        var tempColumn = Object.keys(data[0]);
+        // var tempnotidentifycolumn = [];
+        // // setcolumns(Object.keys(data[0]));
+        // var tempColumn = Object.keys(data[0]);
 
-        tempColumn.map((data) => {
-            if ( data === "source_ip" || data === "Source IP" || data === "SOURCE_IP" || data === "hostname" || data === "host_name" || data === "HostName" || data === "remote_hostname"|| data === "remote_ip" ) {
+        // console.log("data", data);
+        // tempColumn.map((data) => {
+        //     if ( data === "source_ip" || data === "Source IP" || data === "SOURCE_IP" || data === "hostname" || data === "host_name" || data === "HostName" || data === "remote_hostname"|| data === "remote_ip" ) {
 
-            } else {
-                tempnotidentifycolumn.push(data);
-            }
-        })
+        //     } else {
+        //         tempnotidentifycolumn.push(data);
+        //     }
+        // })
 
-        setcolumnswork(tempColumn);
-        setnotidentifycolumn(tempnotidentifycolumn);
+        // setcolumnswork(tempColumn);
+        // setnotidentifycolumn(tempnotidentifycolumn);
+        // setcsvdata(data);
+        // console.log("csvdata", csvdata);
+        // setpermanentcsvdata(data);
+
+        // const finalData =[];
+        // const fetchData = (column) =>{
+        //     fetch('https://regexapi.herokuapp.com/verify/' + String(column), {
+        //         headers: {
+        //             "Access-Control-Allow-Origin": "*"
+        //         }
+        //     })
+        //     .then((response)=>response.json())
+        //     .then((response)=>{
+        //         finalData.push(response);
+        //     })
+        //     .then((response)=>console.log(response))
+        //     .catch((err)=> console.log(err))
+        // }
+
+        // let tempCol = Object.keys(csvdata[0]);
+
+        // console.log("temp col", tempCol);
+        // // api call
+        // tempCol.forEach(col=>{
+        //     fetchData(col);
+        // })
+        // console.log("finalCol", finalData);
+        // setpermanentcsvdata(finalData);
+        // setcsvdata(finalData);
+
         setcsvdata(data);
-        setpermanentcsvdata(data);
+
     }
 
     const checkUser = () => {
-        auth.onAuthStateChanged(async function(user) {
+        auth.onAuthStateChanged(async function (user) {
             if (user) {
                 sessionStorage.setItem("userId", user.uid);
                 sessionStorage.setItem("userEmail", user.email);
             } else {
-              router.push('/login');
+                router.push('/login');
             }
         });
     }
-    
+
     React.useEffect(() => {
         checkUser();
     }, []);
@@ -185,18 +252,18 @@ const uploadcsv = () => {
     const showCsvData = () => {
         var counter = 0;
         return (
-        <>
-            {csvdata.map((data) => {
-                counter = counter + 1;
-                return (
-                    <CsvData
-                        data={data}
-                        key={counter}
-                        selectedData={selectedData}
-                    />
-                );
-            })}
-        </>
+            <>
+                {csvdata.map((data) => {
+                    counter = counter + 1;
+                    return (
+                        <CsvData
+                            data={data}
+                            key={counter}
+                            selectedData={selectedData}
+                        />
+                    );
+                })}
+            </>
         );
     };
 
@@ -232,64 +299,64 @@ const uploadcsv = () => {
     const createNode = (x, y) => {
         const color = randomColor();
         setState(({ graph: { nodes, edges }, counter, ...rest }) => {
-          const id = counter + 1;
-          const from = Math.floor(Math.random() * (counter - 1)) + 1;
-          return {
-            graph: {
-              nodes: [
-                ...nodes,
-                { id, label: `Node ${id}`, color, x, y }
-              ],
-              edges: [
-                ...edges,
-                { from, to: id }
-              ]
-            },
-            counter: id,
-            ...rest
-          }
+            const id = counter + 1;
+            const from = Math.floor(Math.random() * (counter - 1)) + 1;
+            return {
+                graph: {
+                    nodes: [
+                        ...nodes,
+                        { id, label: `Node ${id}`, color, x, y }
+                    ],
+                    edges: [
+                        ...edges,
+                        { from, to: id }
+                    ]
+                },
+                counter: id,
+                ...rest
+            }
         });
     }
     const [state, setState] = React.useState({
         counter: 5,
         graph: {
-          nodes: [
-            { id: 1, label: "10.44.112.139", color: "#e04141" },
-            { id: 2, label: "hvaddc02", color: "#e09c41" },
-            { id: 3, label: "gbnvpwsof02", color: "#e0df41" },
-            { id: 4, label: "gbnvrwapp17", color: "#7be041" },
-            { id: 5, label: "svprdvc01", color: "#d6847e" },
-            { id: 6, label: "iwcmsdev", color: "#21e0c9" },
-            { id: 7, label: "tls-d167", color: "#51e0c9" },
-            { id: 8, label: "tls-d168", color: "#94c1ac" },
-            { id: 9, label: "gbprdxwi01", color: "#44c29a" },
-            { id: 10, label: "gbprdxaw72", color: "#ee90b9" },
-            { id: 11, label: "gbprdxdi01", color: "#26d5b0" },
-          ],
-          edges: [
-            { from: 2, to: 1 },
-            { from: 3, to: 1 },
-            { from: 4, to: 1 },
-            { from: 5, to: 1},
-            { from: 6, to: 1 },
-            { from: 7, to: 1 },
-            { from: 8, to: 1 },
-            { from: 9, to: 1 },
-            { from: 10, to: 1 },
-            { from: 11, to: 1 },
-          ]
+            nodes: [
+                { id: 1, label: "10.44.112.139", color: "#e04141" },
+                { id: 2, label: "hvaddc02", color: "#e09c41" },
+                { id: 3, label: "gbnvpwsof02", color: "#e0df41" },
+                { id: 4, label: "gbnvrwapp17", color: "#7be041" },
+                { id: 5, label: "svprdvc01", color: "#d6847e" },
+                { id: 6, label: "iwcmsdev", color: "#21e0c9" },
+                { id: 7, label: "tls-d167", color: "#51e0c9" },
+                { id: 8, label: "tls-d168", color: "#94c1ac" },
+                { id: 9, label: "gbprdxwi01", color: "#44c29a" },
+                { id: 10, label: "gbprdxaw72", color: "#ee90b9" },
+                { id: 11, label: "gbprdxdi01", color: "#26d5b0" },
+            ],
+            edges: [
+                { from: 2, to: 1 },
+                { from: 3, to: 1 },
+                { from: 4, to: 1 },
+                { from: 5, to: 1 },
+                { from: 6, to: 1 },
+                { from: 7, to: 1 },
+                { from: 8, to: 1 },
+                { from: 9, to: 1 },
+                { from: 10, to: 1 },
+                { from: 11, to: 1 },
+            ]
         },
         events: {
-          select: ({ nodes, edges }) => {
-            console.log("Selected nodes:");
-            console.log(nodes);
-            console.log("Selected edges:");
-            console.log(edges);
-            alert("Selected node: " + nodes);
-          },
-          doubleClick: ({ pointer: { canvas } }) => {
-            createNode(canvas.x, canvas.y);
-          }
+            select: ({ nodes, edges }) => {
+                console.log("Selected nodes:");
+                console.log(nodes);
+                console.log("Selected edges:");
+                console.log(edges);
+                alert("Selected node: " + nodes);
+            },
+            doubleClick: ({ pointer: { canvas } }) => {
+                createNode(canvas.x, canvas.y);
+            }
         }
     });
 
@@ -322,7 +389,7 @@ const uploadcsv = () => {
                     newtempArr.push(data);
                 }
             })
-            
+
             setcsvdata(newtempArr);
             showCsvData();
             setshowall(false);
@@ -346,7 +413,7 @@ const uploadcsv = () => {
                     newtempArr.push(data);
                 }
             })
-            
+
             setcsvdata(newtempArr);
             showCsvData();
             setshowall(false);
@@ -372,8 +439,8 @@ const uploadcsv = () => {
     const handleNext = () => {
         let newSkipped = skipped;
         if (isStepSkipped(activeStep)) {
-        newSkipped = new Set(newSkipped.values());
-        newSkipped.delete(activeStep);
+            newSkipped = new Set(newSkipped.values());
+            newSkipped.delete(activeStep);
         }
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         setSkipped(newSkipped);
@@ -383,15 +450,15 @@ const uploadcsv = () => {
     };
     const handleSkip = () => {
         if (!isStepOptional(activeStep)) {
-        // You probably want to guard against something like this,
-        // it should never occur unless someone's actively trying to break something.
-        throw new Error("You can't skip a step that isn't optional.");
+            // You probably want to guard against something like this,
+            // it should never occur unless someone's actively trying to break something.
+            throw new Error("You can't skip a step that isn't optional.");
         }
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         setSkipped((prevSkipped) => {
-        const newSkipped = new Set(prevSkipped.values());
-        newSkipped.add(activeStep);
-        return newSkipped;
+            const newSkipped = new Set(prevSkipped.values());
+            newSkipped.add(activeStep);
+            return newSkipped;
         });
     };
     const handleReset = () => {
@@ -425,7 +492,7 @@ const uploadcsv = () => {
                     })}
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={handleClosedialogcolumn}>Close</Button>
+                    <Button onClick={handleClosedialogcolumn}>Close</Button>
                 </DialogActions>
             </Dialog>
 
@@ -442,7 +509,7 @@ const uploadcsv = () => {
                     Filter
                 </DialogTitle>
                 <DialogContent>
-                    <TextField 
+                    <TextField
                         fullWidth
                         sx={{ mt: 2 }}
                         label="Host name"
@@ -451,11 +518,11 @@ const uploadcsv = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={handleClosefilter}>Close</Button>
-                <Button onClick={applyFilter}>Apply</Button>
+                    <Button onClick={handleClosefilter}>Close</Button>
+                    <Button onClick={applyFilter}>Apply</Button>
                 </DialogActions>
             </Dialog>
-            
+
 
             <Dialog
                 open={openfilter2}
@@ -469,7 +536,7 @@ const uploadcsv = () => {
                     Filter
                 </DialogTitle>
                 <DialogContent>
-                    <TextField 
+                    <TextField
                         fullWidth
                         sx={{ mt: 2 }}
                         label="Destination Port"
@@ -478,100 +545,100 @@ const uploadcsv = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={handleClosefilter2}>Close</Button>
-                <Button onClick={applyFilter2}>Apply</Button>
+                    <Button onClick={handleClosefilter2}>Close</Button>
+                    <Button onClick={applyFilter2}>Apply</Button>
                 </DialogActions>
             </Dialog>
-           
+
             <Box sx={{ width: '100%', mt: 10 }}>
                 {activeStep === steps.length ? (
                     <>
-                    <Container maxWidth='md' sx={{ mb: 1 }} >
-                        <Stepper activeStep={activeStep}>
-                            {steps.map((label, index) => {
-                            const stepProps = {};
-                            const labelProps = {};
-                            if (isStepOptional(index)) {
-                                
-                            }
-                            if (isStepSkipped(index)) {
-                                stepProps.completed = false;
-                            }
-                            return (
-                                <Step key={label} {...stepProps}>
-                                <StepLabel {...labelProps}>{label}</StepLabel>
-                                </Step>
-                            );
-                            })}
-                        </Stepper>
-                    </Container>
-                    <Container maxWidth="xl" >
-                        
-                        {
-                            csvdata.length === 0 ? (
-                                <>
-                                </>
-                            ) : (
-                                <Box
-                                    sx={{ mt: 2 }}
-                                >
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={6}>
-                                            <TableContainer sx={{ mt: 1 }} component={Paper}>
-                                                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                                    <TableHead>
-                                                    <TableRow>
-                                                        <TableCell align="center"></TableCell>
-                                                        <TableCell align="center">Date & Time</TableCell>
-                                                        <TableCell align="center">Destination Port</TableCell>
-                                                        <TableCell align="center">Host name</TableCell>
-                                                        <TableCell align="center">Process</TableCell>
-                                                        <TableCell align="center">Source IP</TableCell>
-                                                    </TableRow>
-                                                    </TableHead>
-                                                    <TableBody>
-                                                        {showCsvData()}
-                                                    </TableBody>
-                                                </Table>
-                                            </TableContainer>
+                        <Container maxWidth='md' sx={{ mb: 1 }} >
+                            <Stepper activeStep={activeStep}>
+                                {steps.map((label, index) => {
+                                    const stepProps = {};
+                                    const labelProps = {};
+                                    if (isStepOptional(index)) {
+
+                                    }
+                                    if (isStepSkipped(index)) {
+                                        stepProps.completed = false;
+                                    }
+                                    return (
+                                        <Step key={label} {...stepProps}>
+                                            <StepLabel {...labelProps}>{label}</StepLabel>
+                                        </Step>
+                                    );
+                                })}
+                            </Stepper>
+                        </Container>
+                        <Container maxWidth="xl" >
+
+                            {
+                                csvdata.length === 0 ? (
+                                    <>
+                                    </>
+                                ) : (
+                                    <Box
+                                        sx={{ mt: 2 }}
+                                    >
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={6}>
+                                                <TableContainer sx={{ mt: 1 }} component={Paper}>
+                                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                                        <TableHead>
+                                                            <TableRow>
+                                                                <TableCell align="center"></TableCell>
+                                                                <TableCell align="center">Date & Time</TableCell>
+                                                                <TableCell align="center">Destination Port</TableCell>
+                                                                <TableCell align="center">Host name</TableCell>
+                                                                <TableCell align="center">Process</TableCell>
+                                                                <TableCell align="center">Source IP</TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {showCsvData()}
+                                                        </TableBody>
+                                                    </Table>
+                                                </TableContainer>
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                {
+                                                    showall ? (
+                                                        <Graph graph={state.graph} options={options} events={state.events} style={{ height: "900px" }} />
+                                                    ) : (
+                                                        // <Graph graph={state2} options={options} events={state.events} style={{ height: "900px" }} />
+                                                        <>
+                                                        </>
+                                                    )
+                                                }
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={6}>
-                                            {
-                                                showall ? (
-                                                    <Graph graph={state.graph} options={options} events={state.events} style={{ height: "900px" }} />
-                                                ) : (
-                                                    // <Graph graph={state2} options={options} events={state.events} style={{ height: "900px" }} />
-                                                    <>
-                                                    </>
-                                                )
-                                            }
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-                            )
-                        }
-                    </Container>
+                                    </Box>
+                                )
+                            }
+                        </Container>
                     </>
                 ) : (
                     <>
-                        
+
 
                         <Container maxWidth='md' >
                             <Stepper activeStep={activeStep}>
                                 {steps.map((label, index) => {
-                                const stepProps = {};
-                                const labelProps = {};
-                                if (isStepOptional(index)) {
-                                    
-                                }
-                                if (isStepSkipped(index)) {
-                                    stepProps.completed = false;
-                                }
-                                return (
-                                    <Step key={label} {...stepProps}>
-                                    <StepLabel {...labelProps}>{label}</StepLabel>
-                                    </Step>
-                                );
+                                    const stepProps = {};
+                                    const labelProps = {};
+                                    if (isStepOptional(index)) {
+
+                                    }
+                                    if (isStepSkipped(index)) {
+                                        stepProps.completed = false;
+                                    }
+                                    return (
+                                        <Step key={label} {...stepProps}>
+                                            <StepLabel {...labelProps}>{label}</StepLabel>
+                                        </Step>
+                                    );
                                 })}
                             </Stepper>
                             {
@@ -589,7 +656,7 @@ const uploadcsv = () => {
                                         {
                                             columnswork.length === 0 ? (
                                                 <>
-                                                
+
                                                 </>
                                             ) : (
                                                 <Box
@@ -603,10 +670,10 @@ const uploadcsv = () => {
                                                             return (
                                                                 <center>
                                                                     {
-                                                                        data === "source_ip" || data === "Source IP" || data === "SOURCE_IP" || data === "hostname" || data === "host_name" || data === "HostName" || data === "remote_hostname"|| data === "remote_ip" ? (
-                                                                            <Chip onClick={() => handleClickfilter(data)} color="success" label={data} />
+                                                                        data.match == true ? (
+                                                                            <Chip onClick={() => handleClickfilter(data)} color="success" label={data.name} />
                                                                         ) : (
-                                                                            <Chip onClick={() => handleClickfilter(data)} color="success" label={data} />
+                                                                            <Chip onClick={() => handleClickfilter(data)} color="error" label={data.name} />
                                                                         )
                                                                     }
                                                                 </center>
@@ -616,7 +683,7 @@ const uploadcsv = () => {
                                                             Show All
                                                         </Button> */}
                                                     </Stack>
-                                                    
+
                                                 </Box>
                                             )
                                         }
@@ -625,7 +692,7 @@ const uploadcsv = () => {
                             }
 
                             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                                
+
                                 <Box sx={{ flex: '1 1 auto' }} />
                                 {
                                     activeStep === 1 ? (
@@ -635,14 +702,14 @@ const uploadcsv = () => {
                                                 disabled={activeStep === 0}
                                                 onClick={handleBack}
                                                 sx={{ mr: 1 }}
-                                                >
+                                            >
                                                 Back
                                             </Button>
                                             <Button onClick={() => setActiveStep(3)}>
                                                 Visualize Data
                                             </Button>
                                         </>
-                                        
+
                                     ) : (
                                         <>
                                             <Button
@@ -650,7 +717,7 @@ const uploadcsv = () => {
                                                 disabled={activeStep === 0}
                                                 onClick={handleBack}
                                                 sx={{ mr: 1 }}
-                                                >
+                                            >
                                                 Back
                                             </Button>
                                             <Button onClick={handleNext}>
@@ -659,13 +726,13 @@ const uploadcsv = () => {
                                         </>
                                     )
                                 }
-                                
+
                             </Box>
                         </Container>
                     </>
                 )}
             </Box>
-            
+
         </div>
     )
 }
