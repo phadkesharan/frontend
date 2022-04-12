@@ -78,31 +78,7 @@ const papaparseOptions = {
 };
 
 
-const CsvData = ({ data, selectedData }) => {
-    var date = new Date(20190429);
-    return (
-        <>
-            <TableRow
-                key={Date.now()}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-                <TableCell align="center">
-                    <input className='checkboxstyle' onClick={() => selectedData(data)} type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
-                </TableCell>
-                {/* <TableCell align="center">{Date(20190429)}</TableCell> */}
-                <TableCell align="center">{data.destination_port}</TableCell>
-                <TableCell align="center">{data.hostname}</TableCell>
-                <TableCell align="center">{data.process}</TableCell>
-                <TableCell align="center">{data.source_ip}</TableCell>
 
-                {/* <TableCell align="center">{data.destPort}</TableCell>
-                <TableCell align="center">{data.hostName}</TableCell>
-                <TableCell align="center">{data.process}</TableCell>
-                <TableCell align="center">{data.srcIp}</TableCell> */}
-            </TableRow>
-        </>
-    )
-}
 
 const uploadcsv = () => {
 
@@ -146,10 +122,11 @@ const uploadcsv = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     finalData.push(response);
-
-                    if(response.match) {
-                        csvdata.forEach(item=>{
+                    
+                    if (response.match) {
+                        csvdata.forEach(item => {
                             item[response.name] = item[column];
+                            delete item[column];
                         })
                     }
                 })
@@ -158,6 +135,7 @@ const uploadcsv = () => {
         }
 
         if (csvdata[0] != undefined) {
+            console.log("csvData og:", csvdata);
             let tempCol = Object.keys(csvdata[0]);
 
             console.log("csv data: ", csvdata);
@@ -170,7 +148,7 @@ const uploadcsv = () => {
             setpermanentcsvdata(finalData);
             setcolumnswork(finalData)
         }
-
+      
 
     }, [csvdata])
 
@@ -191,6 +169,36 @@ const uploadcsv = () => {
     const handleClosefilter2 = () => {
         setopenfilter2(false);
     };
+
+    const CsvData = ({ data, selectedData }) => {
+        var date = new Date(20190429);
+        return (
+            <>
+                <TableRow
+                    key={Date.now()}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                    <TableCell align="center">
+                        <input className='checkboxstyle' onClick={() => selectedData(data)} type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
+                    </TableCell>
+                    {/* <TableCell align="center">{Date(20190429)}</TableCell> */}
+                    {columnswork.map((item) => {
+                        const s = String(item.name);
+                        return true && <TableCell align="center">{data[s]}</TableCell>
+                    })}
+                    {/* <TableCell align="center">{data.destination_port}</TableCell>
+                    <TableCell align="center">{data.hostname}</TableCell>
+                    <TableCell align="center">{data.process}</TableCell>
+                    <TableCell align="center">{data.source_ip}</TableCell> */}
+    
+                    {/* <TableCell align="center">{data.destPort}</TableCell>
+                    <TableCell align="center">{data.hostName}</TableCell>
+                    <TableCell align="center">{data.process}</TableCell>
+                    <TableCell align="center">{data.srcIp}</TableCell> */}
+                </TableRow>
+            </>
+        )
+    }
 
 
 
@@ -270,7 +278,7 @@ const uploadcsv = () => {
                     counter = counter + 1;
                     return (
                         <CsvData
-                            data={data} 
+                            data={data}
                             key={counter}
                             selectedData={selectedData}
                         />
@@ -603,15 +611,13 @@ const uploadcsv = () => {
                                                             <TableRow>
                                                                 <TableCell align="center"></TableCell>
 
-                                                                {columnswork.map((item)=>{
-                                                                    return item.match == true && <TableCell align="center">item.name</TableCell>
-                                                                })}
 
-                                                                {/* <TableCell align="center">Date & Time</TableCell>
+
+                                                                <TableCell align="center">Date & Time</TableCell>
                                                                 <TableCell align="center">Destination Port</TableCell>
                                                                 <TableCell align="center">Host name</TableCell>
                                                                 <TableCell align="center">Process</TableCell>
-                                                                <TableCell align="center">Source IP</TableCell> */}
+                                                                <TableCell align="center">Source IP</TableCell>
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
@@ -716,10 +722,20 @@ const uploadcsv = () => {
                                                                                             <TableRow>
                                                                                                 <TableCell align="center"></TableCell>
                                                                                                 {/* <TableCell align="center">Date & Time</TableCell> */}
-                                                                                                <TableCell align="center">Destination Port</TableCell>
+
+                                                                                                {columnswork.map((item) => {
+                                                                                                    return item.match == true ? (
+                                                                                                        <TableCell align="center" style={{ backgroundColor: '#34eba1' }}>{item.name}</TableCell>
+                                                                                                    ) :
+                                                                                                        (
+                                                                                                            <TableCell align="center" style={{ backgroundColor: '#d16552' }}>{item.name}</TableCell>
+                                                                                                        )
+                                                                                                })}
+
+                                                                                                {/* <TableCell align="center">Destination Port</TableCell>
                                                                                                 <TableCell align="center">Host name</TableCell>
                                                                                                 <TableCell align="center">Process</TableCell>
-                                                                                                <TableCell align="center">Source IP</TableCell>
+                                                                                                <TableCell align="center">Source IP</TableCell> */}
                                                                                             </TableRow>
                                                                                         </TableHead>
                                                                                         <TableBody>
