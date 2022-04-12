@@ -89,11 +89,16 @@ const CsvData = ({ data, selectedData }) => {
                 <TableCell align="center">
                     <input className='checkboxstyle' onClick={() => selectedData(data)} type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
                 </TableCell>
-                <TableCell align="center">{Date(20190429)}</TableCell>
+                {/* <TableCell align="center">{Date(20190429)}</TableCell> */}
                 <TableCell align="center">{data.destination_port}</TableCell>
                 <TableCell align="center">{data.hostname}</TableCell>
                 <TableCell align="center">{data.process}</TableCell>
                 <TableCell align="center">{data.source_ip}</TableCell>
+
+                {/* <TableCell align="center">{data.destPort}</TableCell>
+                <TableCell align="center">{data.hostName}</TableCell>
+                <TableCell align="center">{data.process}</TableCell>
+                <TableCell align="center">{data.srcIp}</TableCell> */}
             </TableRow>
         </>
     )
@@ -141,6 +146,12 @@ const uploadcsv = () => {
                 .then((response) => response.json())
                 .then((response) => {
                     finalData.push(response);
+
+                    if(response.match) {
+                        csvdata.forEach(item=>{
+                            item[response.name] = item[column];
+                        })
+                    }
                 })
                 .then((response) => console.log(response))
                 .catch((err) => console.log(err))
@@ -149,6 +160,7 @@ const uploadcsv = () => {
         if (csvdata[0] != undefined) {
             let tempCol = Object.keys(csvdata[0]);
 
+            console.log("csv data: ", csvdata);
             console.log("temp col", tempCol);
             // api call
             tempCol.forEach(col => {
@@ -156,7 +168,6 @@ const uploadcsv = () => {
             })
             console.log("finalCol", finalData);
             setpermanentcsvdata(finalData);
-            setcsvdata(finalData);
             setcolumnswork(finalData)
         }
 
@@ -251,13 +262,15 @@ const uploadcsv = () => {
 
     const showCsvData = () => {
         var counter = 0;
+        let csvdata_top = csvdata.splice(0, 10)
         return (
             <>
-                {csvdata.map((data) => {
+                {console.log("csvdata", csvdata)}
+                {csvdata_top.map((data) => {
                     counter = counter + 1;
                     return (
                         <CsvData
-                            data={data}
+                            data={data} 
                             key={counter}
                             selectedData={selectedData}
                         />
@@ -589,11 +602,16 @@ const uploadcsv = () => {
                                                         <TableHead>
                                                             <TableRow>
                                                                 <TableCell align="center"></TableCell>
-                                                                <TableCell align="center">Date & Time</TableCell>
+
+                                                                {columnswork.map((item)=>{
+                                                                    return item.match == true && <TableCell align="center">item.name</TableCell>
+                                                                })}
+
+                                                                {/* <TableCell align="center">Date & Time</TableCell>
                                                                 <TableCell align="center">Destination Port</TableCell>
                                                                 <TableCell align="center">Host name</TableCell>
                                                                 <TableCell align="center">Process</TableCell>
-                                                                <TableCell align="center">Source IP</TableCell>
+                                                                <TableCell align="center">Source IP</TableCell> */}
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
@@ -666,7 +684,7 @@ const uploadcsv = () => {
                                                     <Stack direction="row" spacing={2}>
                                                         {/* {showColumns()} */}
 
-                                                        {columnswork.map((data) => {
+                                                        {/* {columnswork.map((data) => {
                                                             return (
                                                                 <center>
                                                                     {
@@ -676,9 +694,45 @@ const uploadcsv = () => {
                                                                             <Chip onClick={() => handleClickfilter(data)} color="error" label={data.name} />
                                                                         )
                                                                     }
+
                                                                 </center>
                                                             );
-                                                        })}
+                                                        })} */}
+                                                        <Container maxWidth="xl" >
+
+                                                            {
+                                                                csvdata.length === 0 ? (
+                                                                    <>
+                                                                    </>
+                                                                ) : (
+                                                                    <Box
+                                                                        sx={{ mt: 2 }}
+                                                                    >
+                                                                        <Grid container spacing={2}>
+                                                                            <Grid item xs={12}>
+                                                                                <TableContainer sx={{ mt: 1 }} component={Paper}>
+                                                                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                                                                        <TableHead>
+                                                                                            <TableRow>
+                                                                                                <TableCell align="center"></TableCell>
+                                                                                                {/* <TableCell align="center">Date & Time</TableCell> */}
+                                                                                                <TableCell align="center">Destination Port</TableCell>
+                                                                                                <TableCell align="center">Host name</TableCell>
+                                                                                                <TableCell align="center">Process</TableCell>
+                                                                                                <TableCell align="center">Source IP</TableCell>
+                                                                                            </TableRow>
+                                                                                        </TableHead>
+                                                                                        <TableBody>
+                                                                                            {showCsvData()}
+                                                                                        </TableBody>
+                                                                                    </Table>
+                                                                                </TableContainer>
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    </Box>
+                                                                )
+                                                            }
+                                                        </Container>
                                                         {/* <Button onClick={showalldata}>
                                                             Show All
                                                         </Button> */}
