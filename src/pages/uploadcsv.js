@@ -182,9 +182,14 @@ const uploadcsv = () => {
                         <input className='checkboxstyle' onClick={() => selectedData(data)} type="checkbox" id="vehicle1" name="vehicle1" value="Bike" />
                     </TableCell>
                     {/* <TableCell align="center">{Date(20190429)}</TableCell> */}
-                    {columnswork.map((item) => {
+                    {columnswork.map((item, index) => {
                         const s = String(item.name);
-                        return true && <TableCell align="center">{data[s]}</TableCell>
+                        return item.match ? (
+                            <TableCell align="center">{data[s]}</TableCell>
+                        ) :
+                        (
+                            <TableCell align="center">{data[s]}</TableCell>
+                        )
                     })}
                     {/* <TableCell align="center">{data.destination_port}</TableCell>
                     <TableCell align="center">{data.hostname}</TableCell>
@@ -204,6 +209,9 @@ const uploadcsv = () => {
 
 
     const handleForce = (data, fileInfo) => {
+
+        console.log("data", data);
+        console.log("info", fileInfo);
         // var tempnotidentifycolumn = [];
         // // setcolumns(Object.keys(data[0]));
         // var tempColumn = Object.keys(data[0]);
@@ -717,7 +725,7 @@ const uploadcsv = () => {
                                                                         <Grid container spacing={2}>
                                                                             <Grid item xs={12}>
                                                                                 <TableContainer sx={{ mt: 1 }} component={Paper}>
-                                                                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                                                                    <Table sx={{ minWidth: 800 }} style={{ width: 1200 }} aria-label="simple table">
                                                                                         <TableHead>
                                                                                             <TableRow>
                                                                                                 <TableCell align="center"></TableCell>
