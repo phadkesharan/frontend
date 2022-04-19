@@ -102,6 +102,7 @@ const uploadcsv = () => {
   const [openfilter, setopenfilter] = React.useState(false);
   const [openfilter2, setopenfilter2] = React.useState(false);
 
+  const [columntitle, setColumntitle] = React.useState([]);
   const columnName = [
     "date_time_stamp",
     "src_Ip",
@@ -151,6 +152,7 @@ const uploadcsv = () => {
       console.log("finalCol", finalData);
       setpermanentcsvdata(finalData);
       setcolumnswork(finalData);
+      setColumntitle(finalData);
     }
   }, [csvdata]);
 
@@ -699,7 +701,7 @@ const uploadcsv = () => {
                                           <TableCell align="center"></TableCell>
                                           {/* <TableCell align="center">Date & Time</TableCell> */}
 
-                                          {columnswork.map((item, index) => {
+                                          {columntitle.map((item, index) => {
                                             return item.match == true ? (
                                               <TableCell
                                                 align="center"
@@ -723,12 +725,12 @@ const uploadcsv = () => {
                                                 value={item.name}
                                                 label={item.name}
                                                 onChange={({target})=>{
-                                                    let temp_state = [ ...columnswork ];
-                                                    let temp_elem = { ...columnswork[index] };
+                                                    let temp_state = [ ...columntitle ];
+                                                    let temp_elem = { ...columntitle[index] };
                                                     temp_elem.match = true;
                                                     temp_elem.name = target.value;
                                                     temp_state[index] = temp_elem;
-                                                    setcolumnswork(temp_state);
+                                                    setColumntitle(temp_state);
                                                 }}
                                                 >
                                                     {columnName.map((col)=>{
